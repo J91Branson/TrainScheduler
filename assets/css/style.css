@@ -1,5 +1,18 @@
 body {
-    background: url(https://github.com/J91Branson/TrainScheduler/blob/master/assets/images/blur-city-clouds-417013 (1).jpg)
-    object-fit: cover;
-    background-repeat: no-repeat;
+    background: url(../../../TrainScheduler/assets/images/blur-city-clouds-417013.jpg) no-repeat center center fixed;
+    background-size: cover;
+}
+.jumbotron {
+    background-color: #000000;
+    background-image: url("https://www.transparenttextures.com/patterns/brick-wall.png");
+font-family: 'New Rocker', cursive;
+
+}
+.card-header{
+    background-color: #000000;
+    color: aliceblue;
+
 } 
+label {
+    font-weight: bold;
+}
