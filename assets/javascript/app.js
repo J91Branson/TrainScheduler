@@ -1,70 +1,80 @@
 
     
-
+    
     // Initialize Firebase   
     
     var config = {
-        apiKey: "AIzaSyDWC2YRCkUZtkjmRrUo_rAmOpUbk-jYVIA",
-        authDomain: "train-scheduler-f0265.firebaseapp.com",
-        databaseURL: "https://train-scheduler-f0265.firebaseio.com",
-        projectId: "train-scheduler-f0265",
-        storageBucket: "train-scheduler-f0265.appspot.com",
-        messagingSenderId: "346189852819"
-    };
-    
-    
-    
-    firebase.initializeApp(config);
-    
-    var database = firebase.database();
-    var employeeList = database.ref('/employee');
-    var name = "";
-    var destination = "";
-    var frequency = "";
-    var firstTrain = "";
-    var currentTime = moment().format('HH:MM');  
-    employeeList.on('child_added', function(snap){
-        
-        //  var formattedDate = moment.unix(record.start).format('MM/DD/YYYY');
-        
-        $('tbody').append(`
-        <tr>
-        <td>${snap.val().name}</td>
-        <td>${snap.val().destination}</td>
-        <td>${snap.val().frequency}</td>
-        <td>${snap.val().firstTrain}</td>
-        <td>${snap.val()}
-        </tr>
-        `)
-    })
-    
-    $("#submitButton").on("click", function() {
-     event.preventDefault();
-     console.log(currentTime);
+      apiKey: "AIzaSyDWC2YRCkUZtkjmRrUo_rAmOpUbk-jYVIA",
+      authDomain: "train-scheduler-f0265.firebaseapp.com",
+      databaseURL: "https://train-scheduler-f0265.firebaseio.com",
+      projectId: "train-scheduler-f0265",
+      storageBucket: "train-scheduler-f0265.appspot.com",
+      messagingSenderId: "346189852819"
+  };
+  
+  
+  
+  firebase.initializeApp(config);
+  
+  var database = firebase.database();
+  var employeeList = database.ref('/train');
 
-     
-  
-       var newRow = $("<div>");
-       newRow.addClass("doesThisWork");
-       newRow.append("<div class='row'>");
-  
-       
-  
-  
-       name = $("#trainName").val().trim();
-       destination = $("#destination").val().trim();
-       frequency = $("#frequency").val().trim();
-       firstTrain = $("#firstTrain").val().trim();
-       
-  
-       database.ref("/employee").push({
-         name: name,
-         destination: destination,
-         frequency: frequency,
-         firstTrain: firstTrain,
-         
-  
-       })
-     });
+  $("#submit-btn").on("click", function (event) {
+    event.preventDefault();
 
-     
+    var trainName = $("#trainName").val().trim();
+    var destination = $("#destination").val().trim();
+    var firstTrain = $("#firstTrain").val().trim();
+    var frequency = $("#frequency").val().trim();
+
+    var newTrain = {
+      trainName: trainName,
+      destination: destination,
+      firstTrain: firstTrain,
+      frequency: frequency,
+
+    }
+    database.ref().push(newTrain);
+
+
+
+    $("#trainName").val("");
+    $("#destination").val("");
+    $("#firstTrain").val("");
+    $("#frequency").val("");
+
+    
+
+  });
+  
+  database.ref().on("child_added", function (childSnapshot) {
+
+    console.log(childSnapshot.val());
+
+    var trainName = childSnapshot.val().trainName;
+    var destination = childSnapshot.val().destination
+    var firstTrain = childSnapshot.val().firstTrain;
+    var frequency = childSnapshot.val().frequency;
+    var currentTime = moment().format('LT');
+    var firstTrainConverted = moment(firstTrain, "HH:mm").subtract(1, "years");
+    console.log(firstTrainConverted);
+    var diffTime = moment().diff(moment(firstTrainConverted), "minutes");
+    console.log("DIFFERENCE IN TIME: " + diffTime);
+    var remainder = diffTime %frequency;
+    console.log(remainder);
+    var MinutesTillTrain = frequency - remainder;
+    console.log("MINUTES TILL TRAIN: " + MinutesTillTrain);
+    var nextTrain = moment().add(MinutesTillTrain, "minutes");
+    console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
+
+  
+    $("#tbody").append("<tr><td>" + trainName + "</td><td>" +
+     destination + "</td><td>" + frequency + "</td><td>" + nextTrain
+    + "</td><td>" + MinutesTillTrain + "</td");
+
+
+
+  
+  });
+
+  
